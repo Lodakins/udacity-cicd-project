@@ -1,0 +1,56 @@
+---
+# - name: "update apt packages."
+#   become: yes
+#   apt:
+#     update_cache: yes
+
+# - name: "upgrade packages"
+#   become: yes
+#   apt:
+#     upgrade: yes
+
+# - name: remove dependencies that are no longer required
+#   become: yes
+#   apt:
+#     autoremove: yes
+
+# - name: "install dependencies."
+#   become: yes
+#   apt:
+#     name: ["nodejs", "npm", "net-tools"]
+#     state: latest
+#     update_cache: yes
+
+# - name: "install pm2"
+#   become: yes
+#   npm:
+#     name: pm2
+#     global: yes
+#     production: yes
+#     state: present
+
+- name: Creates directory backeend
+  file:
+    path: ~/backend
+    state: directory
+
+- name: printing working directory
+  become: true
+  shell: |
+    pwd
+
+- name: Copy backend tar.gz file and unzip it
+  unarchive:
+    src:  backend.tar.gz
+    dest: /home/ubuntu/backend/
+
+- name: "NPM Install"
+  shell:
+    cmd: npm install
+    chdir: /home/ubuntu/backend/
+
+- name: "Start backend with pm2"
+  become: yes
+  shell: |
+    cd /home/ubuntu/backend/dist
+    pm2 start main.js --name backend
