@@ -447,6 +447,7 @@ jobs:
           name: Install dependencies
           command: |
             apk add --update  curl rsync 
+            
             pip install awscli
       - run:
           name: Remove old stacks and files
