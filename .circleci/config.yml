@@ -190,7 +190,6 @@ jobs:
     steps:
       - checkout
       - run: apk add --update curl
-      - run: apk add tar gzip
       - add_ssh_keys:
           fingerprints: ["b2:1e:84:aa:f1:b6:9e:44:25:ff:90:09:1f:16:ea:a1"]
       - attach_workspace:
@@ -215,12 +214,22 @@ jobs:
       
   run-migrations:
     docker:
-      - image: circleci/node:13.8.0
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
       - restore_cache:
           keys: [backend-build]
-      - run: echo ${CIRCLE_WORKFLOW_ID}
+      - run: apk add --update curl
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible 
+            apk add --no-cache \
+            python3 \
+            py3-pip \
+            && pip3 install --upgrade pip \
+            && pip3 install --no-cache-dir \
+                awscli \
       - run:
           name: Run migrations
           command: |
@@ -236,7 +245,6 @@ jobs:
             then
               echo migration successful
               curl -H "Content-Type: text/plain" -H "token:76f9514c-4cdd-4658-88f9-d7a705af6604" --request PUT --data "1" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:10}
-              # curl -H "Content-Type: text/plain" -H "token:${CIRCLE_WORKFLOW_ID:0:10}" --request PUT --data "1" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:10}
               echo migration successful
             else
                echo migration not successful
@@ -447,7 +455,7 @@ jobs:
           name: Install dependencies
           command: |
             apk add --update  curl rsync 
-            
+
             pip install awscli
       - run:
           name: Remove old stacks and files
