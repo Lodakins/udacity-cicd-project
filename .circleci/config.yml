@@ -406,6 +406,7 @@ jobs:
       - run:
           name: Update cloudfront distribution
           command: |
+          
             export OldWorkflowID=$(aws cloudformation \
                     list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
                     --no-paginate --output text)
@@ -423,9 +424,12 @@ jobs:
             --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
             --tags project=udapeople
 
+<<<<<<< HEAD
              echo "OldWorkFlowID: ${OldWorkflowID}"
 
             echo "currentWorkFlowID: ${CIRCLE_WORKFLOW_ID:0:7}"
+=======
+>>>>>>> 3dc511cd53702fadb04c3b277a3a56d18ca99677
       - destroy-environment:
           id: "${CIRCLE_WORKFLOW_ID:0:7}"
       - revert-migrations:
