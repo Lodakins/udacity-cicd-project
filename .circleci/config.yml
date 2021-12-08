@@ -364,12 +364,10 @@ jobs:
     steps:
       - checkout
       - run: apk add --update curl
-      - run: apk add tar gzip
       - run:
           name: Install dependencies
           command: |
-            apk add --update ansible curl rsync openssh nodejs npm
-            ansible --version
+            apk add --update curl nodejs npm
             pip install awscli
       - run:
           name: Backend smoke test.
@@ -414,7 +412,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update ansible curl rsync openssh nodejs npm
+            apk add --update curl 
             pip install awscli
       - run:
           name: Update cloudfront distribution
@@ -456,7 +454,6 @@ jobs:
           name: Install dependencies
           command: |
             apk add --update  curl rsync 
-
             pip install awscli
       - run:
           name: Remove old stacks and files
