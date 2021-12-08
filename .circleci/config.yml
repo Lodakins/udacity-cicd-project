@@ -190,7 +190,6 @@ jobs:
     steps:
       - checkout
       - run: apk add --update curl
-      - run: apk add tar gzip
       - add_ssh_keys:
           fingerprints: ["b2:1e:84:aa:f1:b6:9e:44:25:ff:90:09:1f:16:ea:a1"]
       - attach_workspace:
@@ -215,12 +214,22 @@ jobs:
       
   run-migrations:
     docker:
-      - image: circleci/node:13.8.0
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
       - restore_cache:
           keys: [backend-build]
-      - run: echo ${CIRCLE_WORKFLOW_ID}
+      - run: apk add --update curl
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible nodejs npm
+            apk add --no-cache \
+            python3 \
+            py3-pip \
+            && pip3 install --upgrade pip \
+            && pip3 install --no-cache-dir \
+                awscli \
       - run:
           name: Run migrations
           command: |
@@ -232,11 +241,11 @@ jobs:
           name: Send migration results to memstash
           command: |
             echo  ${CIRCLE_WORKFLOW_ID:0:10}
+
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
               echo migration successful
               curl -H "Content-Type: text/plain" -H "token:76f9514c-4cdd-4658-88f9-d7a705af6604" --request PUT --data "1" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:10}
-              # curl -H "Content-Type: text/plain" -H "token:${CIRCLE_WORKFLOW_ID:0:10}" --request PUT --data "1" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:10}
               echo migration successful
             else
                echo migration not successful
@@ -355,12 +364,10 @@ jobs:
     steps:
       - checkout
       - run: apk add --update curl
-      - run: apk add tar gzip
       - run:
           name: Install dependencies
           command: |
-            apk add --update ansible curl rsync openssh nodejs npm
-            ansible --version
+            apk add --update curl nodejs npm
             pip install awscli
       - run:
           name: Backend smoke test.
@@ -369,18 +376,23 @@ jobs:
               --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --query "Reservations[*].Instances[*].PublicIpAddress" \
               --output text)
+
             curl -s "http://${BACKEND_IP}:3030/api/status" | grep "ok"
+
             if curl -s "http://${BACKEND_IP}:3030/api/status" | grep "ok"
             then
                 return 0
             else
                 return 1
             fi
+
       - run:
           name: Frontend smoke test.
           command: |
-            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"            
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees" 
+
             echo ${URL} 
+
             if curl -s ${URL} | grep "Welcome"
             then
               return 0
@@ -400,17 +412,15 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update ansible curl rsync openssh nodejs npm
-            ansible --version
+            apk add --update curl 
             pip install awscli
       - run:
           name: Update cloudfront distribution
           command: |
-          
             export OldWorkflowID=$(aws cloudformation \
                     list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
                     --no-paginate --output text)
-          
+
             curl -H "Content-Type: text/plain" -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" \
               --request PUT --data "${OldWorkflowID}" \
                 https://api.memstash.io/values/udapeople_oldworkflow
@@ -424,6 +434,10 @@ jobs:
             --stack-name InitialStack \
             --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
             --tags project=udapeople
+
+            echo oldWorkFlowID: "${OldWorkflowID}"
+
+            echo currentWorkFlowID: "${CIRCLE_WORKFLOW_ID:0:7}"
 
       - destroy-environment:
           id: "${CIRCLE_WORKFLOW_ID:0:7}"
@@ -440,19 +454,23 @@ jobs:
           name: Install dependencies
           command: |
             apk add --update  curl rsync 
-            ansible --version
             pip install awscli
       - run:
           name: Remove old stacks and files
           command: |
             export OldWorkflowID=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" \
                   --request GET https://api.memstash.io/values/udapeople_oldworkflow)
+
             echo "${OldWorkflowID}"
+
             echo "${CIRCLE_WORKFLOW_ID:0:7}"
-            export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
-                    --stack-status-filter CREATE_COMPLETE --no-paginate --output text))            
-            echo "${STACKS[@]}"  
-            if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
+
+            export STACKS=$(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
+                    --stack-status-filter CREATE_COMPLETE --no-paginate --output text)       
+
+            echo "${STACKS}"  
+
+            if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
             then
               aws s3 rm s3://udapeople-"${OldWorkflowID}" --recursive
               aws s3 rb s3://udapeople-"${OldWorkflowID}" --force
