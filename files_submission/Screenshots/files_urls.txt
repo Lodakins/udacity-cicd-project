@@ -1,2 +1,2 @@
 PUBLIC GIT URL
-https://github.com/Lodakins/cdond-c3-projectstarter
+https://github.com/Lodakins/udacity-cicd-project
