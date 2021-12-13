@@ -1,5 +1,5 @@
 PUBLIC GIT URL
-https://github.com/Lodakins/cdond-c3-projectstarter
+https://github.com/Lodakins/udacity-cicd-project
 
 FRONT-END-APP-URL
 http://udapeople-b730949.s3-website-us-east-1.amazonaws.com/#/employees

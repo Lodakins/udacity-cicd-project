@@ -1,2 +1,0 @@
-PUBLIC GIT URL
-https://github.com/Lodakins/udacity-cicd-project
