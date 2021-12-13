@@ -38,3 +38,6 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub backend-${ID}
+
+# cvvawutdswoqbamm
+# lodakins99@gmail.com
