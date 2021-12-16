@@ -191,7 +191,7 @@ jobs:
       - checkout
       - run: apk add --update curl
       - add_ssh_keys:
-          fingerprints: ["b2:1e:84:aa:f1:b6:9e:44:25:ff:90:09:1f:16:ea:a1"]
+          fingerprints: ["f3:17:4e:97:7d:c6:87:2f:d2:2e:23:b9:50:e6:2a:ac"]
       - attach_workspace:
           at: ~/
       - run:
@@ -307,7 +307,7 @@ jobs:
       - run: apk add --update curl
       - run: apk add tar gzip
       - add_ssh_keys:
-          fingerprints: ["b2:1e:84:aa:f1:b6:9e:44:25:ff:90:09:1f:16:ea:a1"]
+          fingerprints: ["f3:17:4e:97:7d:c6:87:2f:d2:2e:23:b9:50:e6:2a:ac"]
       - attach_workspace:
           at: ~/
       - run:
@@ -508,7 +508,7 @@ workflows:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           filters:
             branches:
-              only: [test-feature-branch]
+              only: [master]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
       - run-migrations:
@@ -525,4 +525,4 @@ workflows:
           requires: [cloudfront-update]
 
 
-# aws cloudformation deploy --template-file cloudfront.yml --stack-name InitialStack --parameter-overrides WorkflowID=kkfjfuf8585fkfj8
+# aws cloudformation deploy --template-file cloudfront.yml --stack-name InitialStack --parameter-overrides WorkflowID=fjfjdfj84894erk
