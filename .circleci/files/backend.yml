@@ -6,11 +6,12 @@ Parameters:
     Description: Unique identifier.
     Type: String
 
+Resources:
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: !Sub UdaPeople-${ID}
-      GroupDescription: Allow port 22 and port 3030 and 9100.
+      GroupDescription: Allow port 22 and port 3030.
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22
@@ -24,19 +25,17 @@ Parameters:
           FromPort: 9100
           ToPort: 9100
           CidrIp: 0.0.0.0/0
-  
+
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
       SecurityGroups:
-        - !Ref InstanceSecurityGroup
-      KeyName: project-ansible
-      ImageId: 'ami-0279c3b3186e54acd'
-      InstanceType: t2.micro
+        - Ref: InstanceSecurityGroup
+      KeyName: project-ansible 
+      ImageId: ami-0279c3b3186e54acd 
       Tags:
         - Key: Name
           Value: !Sub backend-${ID}
- 
 
-  
+ 

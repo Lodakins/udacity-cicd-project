@@ -191,7 +191,7 @@ jobs:
       - checkout
       - run: apk add --update curl
       - add_ssh_keys:
-          fingerprints: ["f3:17:4e:97:7d:c6:87:2f:d2:2e:23:b9:50:e6:2a:ac"]
+          fingerprints: ["81:f1:5a:62:20:a2:ea:19:35:2f:01:7b:bd:79:25:01"]
       - attach_workspace:
           at: ~/
       - run:
@@ -307,7 +307,7 @@ jobs:
       - run: apk add --update curl
       - run: apk add tar gzip
       - add_ssh_keys:
-          fingerprints: ["f3:17:4e:97:7d:c6:87:2f:d2:2e:23:b9:50:e6:2a:ac"]
+          fingerprints: ["81:f1:5a:62:20:a2:ea:19:35:2f:01:7b:bd:79:25:01"]
       - attach_workspace:
           at: ~/
       - run:
